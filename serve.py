@@ -3,7 +3,10 @@ import os, json, base64, tempfile
 from starlette.applications import Starlette
 from starlette.routing import Mount, Route
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
+try:
+    from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
+except ImportError:
+    from starlette.middleware.trustedhost import ProxyHeadersMiddleware
 from starlette.responses import JSONResponse
 from analytics_mcp.server import mcp
 
