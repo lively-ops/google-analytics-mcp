@@ -4,6 +4,7 @@ from starlette.applications import Starlette
 from starlette.routing import Mount
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
+from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
 
 
 from analytics_mcp.server import mcp
@@ -39,8 +40,9 @@ _ensure_adc_from_env()
 mcp.settings.mount_path = "/unused"
 app = Starlette(
     routes=[
-        Mount("/sse", app=mcp.sse_app()),
-        Mount("/mcp", app=mcp.streamable_http_app()),
+        Mount("/sse/", app=mcp.sse_app()),
+        Mount("/mcp/", app=mcp.streamable_http_app()),
     ],
+    middleware=[Middleware(ProxyHeadersMiddleware, trusted_hosts="*")]
 )
 app.add_middleware(TokenAuth)
