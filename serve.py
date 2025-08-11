@@ -6,7 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
 
-from google_analytics_mcp.server import mcp
+from analytics_mcp.server import mcp
 
 def _ensure_adc_from_env():
     adc_json = os.getenv("GOOGLE_ADC_JSON")
