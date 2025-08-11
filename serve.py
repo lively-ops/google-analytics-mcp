@@ -1,13 +1,10 @@
-
+# serve.py
 import os, json, base64, tempfile
 from starlette.applications import Starlette
 from starlette.routing import Mount, Route
 from starlette.middleware.base import BaseHTTPMiddleware
-try:
-    from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
-except ImportError:
-    from starlette.middleware.trustedhost import ProxyHeadersMiddleware
 from starlette.responses import JSONResponse
+
 from analytics_mcp.server import mcp
 
 def _ensure_adc_from_env():
@@ -25,9 +22,8 @@ def _ensure_adc_from_env():
 class TokenAuth(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         tok = os.getenv("MCP_AUTH_TOKEN")
-        if tok:
-            if request.headers.get("authorization", "") != f"Bearer {tok}":
-                return JSONResponse({"error":"unauthorized"}, status_code=401)
+        if tok and request.headers.get("authorization", "") != f"Bearer {tok}":
+            return JSONResponse({"error": "unauthorized"}, status_code=401)
         return await call_next(request)
 
 async def healthz(_):
@@ -46,5 +42,4 @@ app = Starlette(
         Route("/healthz", healthz),
     ],
 )
-app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 app.add_middleware(TokenAuth)
