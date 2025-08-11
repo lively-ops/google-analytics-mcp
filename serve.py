@@ -1,11 +1,10 @@
 # serve.py
 import os, json, base64, tempfile
-from starlette.applications import Starlette
-from starlette.routing import Mount, Route
-from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
+from starlette.routing import Route
+from starlette.middleware.base import BaseHTTPMiddleware
 
-from analytics_mcp.server import mcp
+from analytics_mcp.server import mcp 
 
 def _ensure_adc_from_env():
     adc_json = os.getenv("GOOGLE_ADC_JSON")
@@ -30,16 +29,15 @@ async def healthz(_):
     return JSONResponse({"ok": True})
 
 _ensure_adc_from_env()
+
+
+app = mcp.streamable_http_app()
+
+
 try:
-    mcp.settings.mount_path = "/unused"
+    app.router.routes.append(Route("/healthz", healthz))
 except Exception:
     pass
 
-app = Starlette(
-    routes=[
-        Mount("/mcp/", app=mcp.streamable_http_app()),
-        Mount("/", app=mcp.streamable_http_app()),
-        Route("/healthz", healthz),
-    ],
-)
+
 app.add_middleware(TokenAuth)
