@@ -37,7 +37,7 @@ except Exception:
 
 app = Starlette(
     routes=[
-        Mount("/mcp/", app=mcp.streamable_http_app(path="/")),
+        Mount("/mcp/", app=mcp.streamable_http_app()),
         Mount("/", app=mcp.streamable_http_app()),
         Route("/healthz", healthz),
     ],
